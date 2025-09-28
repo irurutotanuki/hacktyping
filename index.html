@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacking Typing - ハッキングタイピング</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #000;
+            color: #00FF00;
+            overflow: hidden;
+        }
+        .terminal {
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 15px #00FF00, 0 0 5px #00FF00 inset;
+            background-color: rgba(0, 10, 0, 0.8);
+            backdrop-filter: blur(3px);
+        }
+        .terminal-header {
+            background-color: #00FF00;
+            color: #000;
+            padding: 2px 8px;
+            font-weight: bold;
+        }
+        .text-glow {
+            text-shadow: 0 0 5px #00FF00;
+        }
+        .button {
+            border: 2px solid #00FF00;
+            padding: 10px 20px;
+            background-color: transparent;
+            color: #00FF00;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .button:hover, .button.active {
+            background-color: #00FF00;
+            color: #000;
+            box-shadow: 0 0 15px #00FF00;
+        }
+        .typed-char {
+            color: #007700;
+        }
+        .current-char {
+            background-color: #00FF00;
+            color: #000;
+        }
+        .glitch {
+            animation: glitch 1s linear infinite;
+        }
+        @keyframes glitch {
+            2%, 64% { transform: translate(2px, 0) skew(0deg); }
+            4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+            62% { transform: translate(0, 0) skew(5deg); }
+        }
+        .typewriter {
+            overflow: hidden;
+            border-right: .15em solid #00FF00;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 2s steps(30, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00FF00; }
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex items-center justify-center p-4">
+
+    <div id="game-container" class="w-full h-full">
+
+        <!-- 1. 開始画面 (偽ブラウザ) -->
+        <div id="start-screen" class="w-full h-full flex items-center justify-center">
+            <div class="w-full max-w-2xl h-auto bg-gray-200 rounded-lg shadow-2xl overflow-hidden border-2 border-gray-400">
+                <div class="bg-gray-300 p-2 flex items-center gap-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <div class="flex-grow bg-white rounded px-2 text-gray-700 text-sm">https://google.com</div>
+                </div>
+                <div class="p-8 flex flex-col items-center justify-center text-gray-800" style="font-family: sans-serif;">
+                    <h1 class="text-5xl font-bold mb-4">Google</h1>
+                    <div class="w-full max-w-lg border border-gray-300 rounded-full p-2 flex">
+                        <input type="text" class="flex-grow bg-transparent outline-none" value="絶対にクリックしてはいけないファイル">
+                    </div>
+                    <div class="mt-8 p-4 border border-dashed border-gray-400 rounded-lg">
+                        <p class="text-center font-bold">ダウンロードが完了しました：</p>
+                        <div id="download-btn" class="mt-2 flex items-center gap-2 p-3 bg-white rounded-lg shadow cursor-pointer hover:bg-gray-100">
+                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span class="font-semibold text-red-600">ウイルスだよ～ん.exe</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. ウイルス演出画面 -->
+        <div id="virus-animation-screen" class="hidden w-full h-full flex flex-col items-center justify-center text-center">
+            <h1 class="text-4xl md:text-6xl text-red-500 text-glow glitch mb-4">[! DANGER !]</h1>
+            <p class="text-xl md:text-2xl mb-8">UNKNOWN FILE DETECTED. SYSTEM CORRUPTION IN PROGRESS...</p>
+            <div class="w-full max-w-xl bg-gray-900 border-2 border-red-500 rounded p-2">
+                <div id="progress-bar" class="h-6 bg-red-500 rounded" style="width: 0%;"></div>
+            </div>
+            <p id="progress-text" class="mt-2 text-lg">Injecting malware... 0%</p>
+        </div>
+        
+        <!-- 3. ポップアップ画面 -->
+        <div id="intro-popup" class="hidden w-full h-full items-center justify-center">
+            <div class="terminal p-8 rounded-lg text-center max-w-lg w-full">
+                <h2 class="text-3xl text-glow mb-4 typewriter">SYSTEM ALERT</h2>
+                <p class="text-xl mb-8">ウイルスがPCに侵入した！<br>ハッキングタイピングで迎撃せよ！</p>
+                <button id="show-difficulty-btn" class="button text-2xl">迎撃開始</button>
+            </div>
+        </div>
+
+        <!-- 4. 難易度選択画面 -->
+        <div id="difficulty-screen" class="hidden w-full h-full flex-col items-center justify-center">
+            <div class="terminal p-8 rounded-lg text-center max-w-2xl w-full">
+                <h2 class="text-3xl text-glow mb-6">HACKER RANK SELECTION</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="difficulty-btn button text-xl" data-difficulty="beginner">初心者ハッカー</button>
+                    <button class="difficulty-btn button text-xl" data-difficulty="intermediate">中級者ハッカー</button>
+                    <button class="difficulty-btn button text-xl" data-difficulty="advanced">上級者ハッカー</button>
+                    <button class="difficulty-btn button text-xl" data-difficulty="god">ゴッドハッカー</button>
+                    <button class="difficulty-btn button text-xl col-span-1 md:col-span-2" data-difficulty="legend">レジェンドハッカー</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. ゲーム画面 -->
+        <div id="main-game-screen" class="hidden w-full h-full flex-col items-center justify-center">
+            <div class="terminal p-6 rounded-lg w-full max-w-4xl">
+                <div class="terminal-header flex justify-between">
+                    <span>C:\WINDOWS\system32\cmd.exe - typing_battle</span>
+                    <span>_ □ X</span>
+                </div>
+                <div class="p-4 h-80 flex flex-col justify-between">
+                    <div class="flex justify-between text-lg">
+                        <p>TIME: <span id="time">0.00</span></p>
+                        <p>SCORE: <span id="score">0</span></p>
+                        <p>MISS: <span id="miss">0</span></p>
+                    </div>
+                    <div id="typing-area" class="text-center">
+                        <div class="mb-4">
+                            <div class="w-full bg-gray-800 border border-red-500 rounded-full h-2.5">
+                                <div id="question-timer-bar" class="bg-red-500 h-2 rounded-full" style="width: 100%; transition: width 0.1s linear;"></div>
+                            </div>
+                        </div>
+                        <p id="ja-text" class="text-2xl md:text-3xl mb-2"></p>
+                        <p id="ro-text" class="text-xl md:text-2xl font-mono tracking-widest h-8"></p>
+                    </div>
+                    <div class="text-center">
+                         <p>LEVEL: <span id="level-display" class="uppercase"></span> | Question <span id="question-count">1</span> / <span id="question-total">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 6. 結果画面 (勝利) -->
+        <div id="victory-screen" class="hidden w-full h-full flex-col items-center justify-center">
+            <div class="terminal p-8 rounded-lg text-center max-w-2xl w-full">
+                 <h2 class="text-4xl text-glow mb-6 text-cyan-400">VIRUS NEUTRALIZED</h2>
+                 <p class="text-2xl mb-8">おめでとう！PCは守られた！</p>
+                 <div class="text-left text-2xl space-y-3 mb-8">
+                     <p>TOTAL SCORE: <span id="victory-score"></span></p>
+                     <p>TOTAL TIME: <span id="victory-time"></span>s</p>
+                     <p>TOTAL MISS: <span id="victory-miss"></span></p>
+                 </div>
+                 <div class="flex gap-4 justify-center">
+                    <button id="victory-retry-btn" class="button text-xl">もう一度プレイ</button>
+                    <button id="victory-change-difficulty-btn" class="button text-xl">難易度変更</button>
+                 </div>
+            </div>
+        </div>
+
+        <!-- 7. ゲームオーバー画面 -->
+        <div id="game-over-screen" class="hidden w-full h-full flex-col items-center justify-center">
+            <div class="terminal p-8 rounded-lg text-center max-w-2xl w-full">
+                 <h2 class="text-4xl text-glow mb-6 text-red-500">SYSTEM FAILURE</h2>
+                 <p class="text-2xl mb-4">ウイルスにシステムを乗っ取られた...</p>
+                 <div class="text-left text-2xl space-y-3 mb-8">
+                     <p>あと<span id="game-over-remaining"></span>問でウイルス撃破だった。</p>
+                     <p>達成率: <span id="game-over-percentage"></span>%</p>
+                 </div>
+                 <div class="flex gap-4 justify-center">
+                    <button id="game-over-retry-btn" class="button text-xl">もう一度プレイ</button>
+                 </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        // --- DOM要素 ---
+        const screens = {
+            start: document.getElementById('start-screen'),
+            virus: document.getElementById('virus-animation-screen'),
+            intro: document.getElementById('intro-popup'),
+            difficulty: document.getElementById('difficulty-screen'),
+            game: document.getElementById('main-game-screen'),
+            victory: document.getElementById('victory-screen'),
+            gameOver: document.getElementById('game-over-screen'),
+        };
+        const downloadBtn = document.getElementById('download-btn');
+        const showDifficultyBtn = document.getElementById('show-difficulty-btn');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        
+        const jaText = document.getElementById('ja-text');
+        const roText = document.getElementById('ro-text');
+        const timeDisplay = document.getElementById('time');
+        const scoreDisplay = document.getElementById('score');
+        const missDisplay = document.getElementById('miss');
+        const levelDisplay = document.getElementById('level-display');
+        const questionTimerBar = document.getElementById('question-timer-bar');
+        const questionCountDisplay = document.getElementById('question-count');
+        const questionTotalDisplay = document.getElementById('question-total');
+
+        const victoryScore = document.getElementById('victory-score');
+        const victoryTime = document.getElementById('victory-time');
+        const victoryMiss = document.getElementById('victory-miss');
+        const victoryRetryBtn = document.getElementById('victory-retry-btn');
+        const victoryChangeDifficultyBtn = document.getElementById('victory-change-difficulty-btn');
+
+        const gameOverRemaining = document.getElementById('game-over-remaining');
+        const gameOverPercentage = document.getElementById('game-over-percentage');
+        const gameOverRetryBtn = document.getElementById('game-over-retry-btn');
+
+        // --- 単語データ (修正済み) ---
+        const wordsData = {
+            beginner: [
+                { ja: 'さくら', ro: ['sakura'] }, { ja: 'にほん', ro: ['nihon', 'nihonn'] }, { ja: 'こんにちは', ro: ['konnichiha', 'konnichiwa'] },
+                { ja: 'ありがとう', ro: ['arigatou'] }, { ja: 'おはよう', ro: ['ohayou'] }, { ja: 'がっこう', ro: ['gakkou'] },
+                { ja: 'えんぴつ', ro: ['enpitsu', 'ennpitsu'] }, { ja: 'たいよう', ro: ['taiyou'] }, { ja: 'つき', ro: ['tsuki', 'tuki'] },
+                { ja: 'ほしぞら', ro: ['hoshizora'] }, { ja: 'いぬ', ro: ['inu'] }, { ja: 'ねこ', ro: ['neko'] },
+                { ja: 'やま', ro: ['yama'] }, { ja: 'かわ', ro: ['kawa'] }, { ja: 'うみ', ro: ['umi'] },
+                { ja: 'ごはん', ro: ['gohan'] }, { ja: 'みず', ro: ['mizu'] }, { ja: 'パソコン', ro: ['pasokon'] },
+                { ja: 'キーボード', ro: ['ki-bo-do'] }, { ja: 'タイピング', ro: ['taipingu'] }
+            ],
+            intermediate: [
+                { ja: 'しょうがっこう', ro: ['shougakkou', 'syougakkou'] }, { ja: 'ちゅうがっこう', ro: ['chuugakkou', 'tyuugakkou'] },
+                { ja: 'としょかん', ro: ['toshokan', 'tosyokan'] }, { ja: 'すいぞくかん', ro: ['suizokukan'] }, { ja: 'どうぶつえん', ro: ['doubutsuen'] },
+                { ja: 'しんかんせん', ro: ['shinkansen', 'sinkansen'] }, { ja: 'おもてなし', ro: ['omotenashi'] }, { ja: 'せかいへいわ', ro: ['sekaiheiwa'] },
+                { ja: 'こくさいこうりゅう', ro: ['kokusaikouryuu'] }, { ja: 'きょういく', ro: ['kyouiku'] }, { ja: 'ぶんか', ro: ['bunka', 'bunnka'] },
+                { ja: 'れきし', ro: ['rekishi'] }, { ja: 'かがく', ro: ['kagaku'] }, { ja: 'しゃかい', ro: ['shakai', 'syakai'] },
+                { ja: 'さんすう', ro: ['sansuu'] }, { ja: 'りか', ro: ['rika'] }, { ja: 'おんがく', ro: ['ongaku'] },
+                { ja: 'びじゅつ', ro: ['bijutsu'] }, { ja: 'たいいく', ro: ['taiiku'] }, { ja: 'プログラミング', ro: ['puroguramingu'] }
+            ],
+            advanced: [
+                { ja: '石の上にも三年', ro: ['ishinouenimosannen'] }, { ja: '光陰矢の如し', ro: ['kouinyanogotoshi'] },
+                { ja: '失敗は成功のもと', ro: ['shippaihaseikounomoto', 'sippaihaseikounomoto'] }, { ja: '継続は力なり', ro: ['keizokuhachikaranari'] },
+                { ja: '明日は明日の風が吹く', ro: ['ashitahaashitanokazegafuku', 'asitahaasitanokazegafuku'] }, { ja: 'ちりも積もれば山となる', ro: ['chirimotsumorebayamanatonaru', 'tirimotumorebayamanatonaru'] },
+                { ja: '終わりよければすべてよし', ro: ['owariyokerebasubeteyoshi'] }, { ja: '善は急げ', ro: ['zenhaisoge'] },
+                { ja: '郷に入っては郷に従え', ro: ['gouniittehagounishitagae'] }, { ja: '猿も木から落ちる', ro: ['sarumokikaraochiru'] },
+                { ja: '思い立ったが吉日', ro: ['omoitattagakichijitsu', 'omoitattagakitijitu'] }, { ja: '初心忘るべからず', ro: ['shoshinwasurubekarazu', 'syosinwasurubekarazu'] },
+                { ja: '能ある鷹は爪を隠す', ro: ['nouarutakahatsumewokakusu'] }, { ja: '七転び八起き', ro: ['nanakorobiyaoki'] },
+                { ja: '笑う門には福来る', ro: ['waraukadonihafukukitaru'] }
+            ],
+            god: [
+                { ja: '事実は小説よりも奇なり。', ro: ['jijitsuhashousetsuyorimokinari.'] }, { ja: '天は人の上に人を造らず、人の下に人を造らず。', ro: ['tenhahitonouenihitowotsukurazu,hitonoshitanihitowotsukurazu.'] },
+                { ja: '青は藍より出でて藍より青し。', ro: ['aohaaiyoriideteaiyoriaoshi.'] }, { ja: '国破れて山河あり、城春にして草木深し。', ro: ['kuniyaburetesangaari,shiroharunishitesoumokufukashi.'] },
+                { ja: '吾輩は猫である。名前はまだ無い。', ro: ['wagahaihanekodearu.namaehamadanai.'] }, { ja: '祇園精舎の鐘の声、諸行無常の響きあり。', ro: ['gionshoujanokanenokoe,shogyoumujyounohibikiari.'] },
+                { ja: '李下に冠を正さず、瓜田に履を納れず。', ro: ['rikanikanmuriwotadasazu,kadenikutsuwoirezu.'] }, { ja: '少年よ大志を抱け。', ro: ['shounenyotaishiwoidake.', 'syounenyotaisiwoidake.'] },
+                { ja: '地球は青かった。', ro: ['chikyuuhaookatta.'] }, { ja: '隣の客はよく柿食う客だ。', ro: ['tonarinokyakuhayokukakikuukyakuda.'] },
+                { ja: '生麦生米生卵。', ro: ['namamuginamagomenamatamago.'] }, { ja: '人の振り見て我が振り直せ。', ro: ['hitonofurimitewagafurinaose.'] },
+                { ja: '人間万事塞翁が馬。', ro: ['ningenbanjisaiougauma.'] }, { ja: 'ペンは剣よりも強し。', ro: ['penhakenyorimotsuyoshi.'] },
+                { ja: '百聞は一見に如かず。', ro: ['hyakubunhaikkennishikazu.'] }
+            ],
+            legend: [
+                { ja: 'この竹垣に竹立て掛けたのは竹立て掛けたかったから竹立て掛けた。', ro: ['konotakegakinitaketatekaketanohadaketatekaketakattakarataketatekaketa.'] },
+                { ja: '寿限無、寿限無、五劫の擦り切れ、海砂利水魚の、水行末。', ro: ['jugemu,jugemu,gokounosurikire,kaisarisuigyo,suigyoumatsu.'] },
+                { ja: '肩固かったから買った肩たたき機、高かった。', ro: ['katakatakattakarakattakatatatakiki,takakatta.'] },
+                { ja: '東京特許許可局長今日急遽休暇許可却下。', ro: ['toukyoutokkyokyokakyokuchoukyoukyuukyokyuukakyokakyakka.'] },
+                { ja: '客観的で普遍的な思考は、主観的な感情を排除することから始まる。', ro: ['kyakkantekidefuhenntekinashikouhashukantekinakannjouwohaijosurukotokarahajimaru.'] },
+                { ja: '量子力学における重ね合わせの原理は、古典物理学の常識とは相容れない。', ro: ['ryoushirikigakuniokerukasaneawasenogenrihakotenbutsurigakunojousikitohaaiirenai.'] },
+                { ja: '複雑な社会経済状況下では、単一の解決策で問題が解消することは稀である。', ro: ['fukuzatsunashakaikeizaijoukyoukadehatannitsunokaiketsusakudemonndaikakaisyousurukotohamaredearu.'] },
+                { ja: '著作権の保護期間は、著作者の死後70年まで存続する。', ro: ['chosakukennohogokikanha,chosakushanosigo70nenmadezonzokusuru.'] },
+                { ja: 'ブラキオサウルスはジュラ紀後期に生息していた巨大な竜脚類の恐竜の一種である。', ro: ['burakiosaurusuwajurakikoukiniseisokushiteitakyodainaryuukyakuruinokyoryuunoissyudearu.'] },
+                { ja: '吾輩はアンドロイドである。まだ感情というものは、よく理解できない。', ro: ['wagahaihaandroidodearu.madakanjoutoiumonohayokurikaidekinai.'] }
+            ]
+        };
+        
+        // 5問ごとの制限時間
+        const timeLimitLevels = [8, 7.8, 7.7, 7.6, 7.5, 7.3, 7, 6.7, 6.5, 6, 5.8, 5, 4.9, 4.8, 4.7, 4.6, 4.5, 4.4, 4.3, 4.2, 4, 3.8, 3.5, 3, 2.5, 2.2, 2, 1.5, 1];
+
+        // --- ゲーム状態変数 ---
+        let currentDifficulty;
+        let words = [];
+        let wordIndex = 0;
+        let score = 0;
+        let miss = 0;
+        let typedCharsCount = 0;
+        let startTime;
+        let timerInterval;
+
+        let questionTimerInterval;
+        let questionTimeout;
+
+        let currentRomanPatterns = [];
+        let mainRoman = '';
+        let typedUserInput = '';
+
+        // --- 関数 ---
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+            screens[screenId].classList.remove('hidden');
+            screens[screenId].classList.add('flex');
+        }
+
+        function startVirusAnimation() {
+            showScreen('virus');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => showScreen('intro'), 500);
+                } else {
+                    width++;
+                    progressBar.style.width = width + '%';
+                    progressText.textContent = `Injecting malware... ${width}%`;
+                }
+            }, 30);
+        }
+
+        function selectDifficulty(difficulty) {
+            currentDifficulty = difficulty;
+            levelDisplay.textContent = difficulty;
+            words = [...wordsData[difficulty]].sort(() => 0.5 - Math.random());
+            questionTotalDisplay.textContent = words.length;
+            startGame();
+        }
+
+        function startGame() {
+            wordIndex = 0;
+            score = 0;
+            miss = 0;
+            typedCharsCount = 0;
+            scoreDisplay.textContent = score;
+            missDisplay.textContent = miss;
+            
+            showScreen('game');
+            setupNewWord();
+
+            startTime = new Date();
+            clearInterval(timerInterval); // 念のためクリア
+            timerInterval = setInterval(() => {
+                const elapsedTime = (new Date() - startTime) / 1000;
+                timeDisplay.textContent = elapsedTime.toFixed(2);
+            }, 100);
+        }
+        
+        function setupNewWord() {
+            clearQuestionTimers();
+            questionCountDisplay.textContent = wordIndex + 1;
+
+            const timeLimitIndex = Math.floor(wordIndex / 5);
+            
+            if (wordIndex >= words.length || timeLimitIndex >= timeLimitLevels.length) {
+                gameWin();
+                return;
+            }
+
+            const currentWord = words[wordIndex];
+            jaText.textContent = currentWord.ja;
+            
+            currentRomanPatterns = currentWord.ro;
+            mainRoman = currentRomanPatterns[0];
+            typedUserInput = '';
+
+            updateRoTextDisplay();
+            startQuestionTimer(timeLimitLevels[timeLimitIndex]);
+        }
+
+        function updateRoTextDisplay() {
+            const typedLength = typedUserInput.length;
+            roText.innerHTML = `
+                <span class="typed-char">${mainRoman.substring(0, typedLength)}</span>
+                <span class="current-char">${mainRoman.substring(typedLength, typedLength + 1)}</span>
+                <span>${mainRoman.substring(typedLength + 1)}</span>
+            `;
+        }
+
+        function clearQuestionTimers() {
+            clearInterval(questionTimerInterval);
+            clearTimeout(questionTimeout);
+        }
+
+        function startQuestionTimer(limit) {
+            const startTime = Date.now();
+            questionTimerBar.style.width = '100%';
+
+            questionTimerInterval = setInterval(() => {
+                const elapsedTime = Date.now() - startTime;
+                const remainingPercentage = Math.max(0, 100 - (elapsedTime / (limit * 1000)) * 100);
+                questionTimerBar.style.width = `${remainingPercentage}%`;
+            }, 100);
+
+            questionTimeout = setTimeout(gameOver, limit * 1000);
+        }
+
+        function gameWin() {
+            clearInterval(timerInterval);
+            clearQuestionTimers();
+            const elapsedTime = (new Date() - startTime) / 1000;
+            
+            victoryScore.textContent = score;
+            victoryTime.textContent = elapsedTime.toFixed(2);
+            victoryMiss.textContent = miss;
+            
+            showScreen('victory');
+        }
+
+        function gameOver() {
+            clearInterval(timerInterval);
+            clearQuestionTimers();
+            
+            const remaining = words.length - wordIndex;
+            const percentage = (wordIndex / words.length * 100).toFixed(1);
+            
+            gameOverRemaining.textContent = remaining;
+            gameOverPercentage.textContent = percentage;
+
+            showScreen('gameOver');
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === ' ' && jaText.textContent.includes(' ')) {
+                 e.preventDefault();
+            }
+
+            const key = e.key;
+            if (!/^[a-z0-9-.,]$/.test(key)) return;
+
+            const nextInput = typedUserInput + key;
+            
+            let matchFound = false;
+            
+            // 1. 現在のメインパターンでチェック
+            if (mainRoman.startsWith(nextInput)) {
+                matchFound = true;
+            } else {
+                // 2. 他のパターンでチェック
+                for (const pattern of currentRomanPatterns) {
+                    if (pattern.startsWith(nextInput)) {
+                        mainRoman = pattern; // パターンを切り替え
+                        matchFound = true;
+                        break;
+                    }
+                }
+            }
+            
+            if (matchFound) {
+                typedUserInput = nextInput;
+                typedCharsCount++;
+                updateRoTextDisplay();
+
+                if (typedUserInput === mainRoman) {
+                    score++;
+                    scoreDisplay.textContent = score;
+                    wordIndex++;
+                    clearQuestionTimers();
+                    setTimeout(setupNewWord, 100); // 次の単語へ
+                }
+            } else {
+                miss++;
+                missDisplay.textContent = miss;
+                // ミスした時に画面を赤く光らせる
+                screens.game.style.boxShadow = '0 0 25px red, 0 0 10px red inset';
+                setTimeout(() => {
+                    screens.game.style.boxShadow = '';
+                }, 200);
+            }
+        }
+
+        // --- イベントリスナー ---
+        downloadBtn.addEventListener('click', startVirusAnimation);
+        showDifficultyBtn.addEventListener('click', () => showScreen('difficulty'));
+
+        difficultyBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectDifficulty(btn.dataset.difficulty);
+            });
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (screens.game.classList.contains('flex')) {
+                handleKeyPress(e);
+            }
+        });
+        
+        victoryRetryBtn.addEventListener('click', () => {
+            selectDifficulty(currentDifficulty);
+        });
+
+        victoryChangeDifficultyBtn.addEventListener('click', () => {
+            showScreen('difficulty');
+        });
+
+        gameOverRetryBtn.addEventListener('click', () => {
+            selectDifficulty(currentDifficulty);
+        });
+
+        // 初期画面表示
+        showScreen('start');
+    });
+</script>
+</body>
+</html>
+
