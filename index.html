@@ -237,51 +237,51 @@
         const gameOverPercentage = document.getElementById('game-over-percentage');
         const gameOverRetryBtn = document.getElementById('game-over-retry-btn');
 
-        // --- 単語データ (修正済み) ---
+        // --- 単語データ (ローマ字パターン追加) ---
         const wordsData = {
             beginner: [
-                { ja: 'さくら', ro: ['sakura'] }, { ja: 'にほん', ro: ['nihon', 'nihonn'] }, { ja: 'こんにちは', ro: ['konnichiha', 'konnichiwa'] },
+                { ja: 'さくら', ro: ['sakura'] }, { ja: 'にほん', ro: ['nihon', 'nihonn'] }, { ja: 'こんにちは', ro: ['konnichiha', 'konnichiwa', 'konnitiha', 'konnitiwa'] },
                 { ja: 'ありがとう', ro: ['arigatou'] }, { ja: 'おはよう', ro: ['ohayou'] }, { ja: 'がっこう', ro: ['gakkou'] },
-                { ja: 'えんぴつ', ro: ['enpitsu', 'ennpitsu'] }, { ja: 'たいよう', ro: ['taiyou'] }, { ja: 'つき', ro: ['tsuki', 'tuki'] },
-                { ja: 'ほしぞら', ro: ['hoshizora'] }, { ja: 'いぬ', ro: ['inu'] }, { ja: 'ねこ', ro: ['neko'] },
+                { ja: 'えんぴつ', ro: ['enpitsu', 'ennpitsu', 'enpitu', 'ennpitu'] }, { ja: 'たいよう', ro: ['taiyou'] }, { ja: 'つき', ro: ['tsuki', 'tuki'] },
+                { ja: 'ほしぞら', ro: ['hoshizora', 'hosizora'] }, { ja: 'いぬ', ro: ['inu'] }, { ja: 'ねこ', ro: ['neko'] },
                 { ja: 'やま', ro: ['yama'] }, { ja: 'かわ', ro: ['kawa'] }, { ja: 'うみ', ro: ['umi'] },
-                { ja: 'ごはん', ro: ['gohan'] }, { ja: 'みず', ro: ['mizu'] }, { ja: 'パソコン', ro: ['pasokon'] },
+                { ja: 'ごはん', ro: ['gohan'] }, { ja: 'みず', ro: ['mizu', 'midu'] }, { ja: 'パソコン', ro: ['pasokon'] },
                 { ja: 'キーボード', ro: ['ki-bo-do'] }, { ja: 'タイピング', ro: ['taipingu'] }
             ],
             intermediate: [
                 { ja: 'しょうがっこう', ro: ['shougakkou', 'syougakkou'] }, { ja: 'ちゅうがっこう', ro: ['chuugakkou', 'tyuugakkou'] },
-                { ja: 'としょかん', ro: ['toshokan', 'tosyokan'] }, { ja: 'すいぞくかん', ro: ['suizokukan'] }, { ja: 'どうぶつえん', ro: ['doubutsuen'] },
-                { ja: 'しんかんせん', ro: ['shinkansen', 'sinkansen'] }, { ja: 'おもてなし', ro: ['omotenashi'] }, { ja: 'せかいへいわ', ro: ['sekaiheiwa'] },
+                { ja: 'としょかん', ro: ['toshokan', 'tosyokan', 'tosikan'] }, { ja: 'すいぞくかん', ro: ['suizokukan'] }, { ja: 'どうぶつえん', ro: ['doubutsuen', 'doubutuen'] },
+                { ja: 'しんかんせん', ro: ['shinkansen', 'sinkansen'] }, { ja: 'おもてなし', ro: ['omotenashi', 'omotenasi'] }, { ja: 'せかいへいわ', ro: ['sekaiheiwa'] },
                 { ja: 'こくさいこうりゅう', ro: ['kokusaikouryuu'] }, { ja: 'きょういく', ro: ['kyouiku'] }, { ja: 'ぶんか', ro: ['bunka', 'bunnka'] },
-                { ja: 'れきし', ro: ['rekishi'] }, { ja: 'かがく', ro: ['kagaku'] }, { ja: 'しゃかい', ro: ['shakai', 'syakai'] },
+                { ja: 'れきし', ro: ['rekishi', 'rekisi'] }, { ja: 'かがく', ro: ['kagaku'] }, { ja: 'しゃかい', ro: ['shakai', 'syakai'] },
                 { ja: 'さんすう', ro: ['sansuu'] }, { ja: 'りか', ro: ['rika'] }, { ja: 'おんがく', ro: ['ongaku'] },
-                { ja: 'びじゅつ', ro: ['bijutsu'] }, { ja: 'たいいく', ro: ['taiiku'] }, { ja: 'プログラミング', ro: ['puroguramingu'] }
+                { ja: 'びじゅつ', ro: ['bijutsu', 'bijutu', 'bizyutu', 'bizyutsu'] }, { ja: 'たいいく', ro: ['taiiku'] }, { ja: 'プログラミング', ro: ['puroguramingu'] }
             ],
             advanced: [
-                { ja: '石の上にも三年', ro: ['ishinouenimosannen'] }, { ja: '光陰矢の如し', ro: ['kouinyanogotoshi'] },
-                { ja: '失敗は成功のもと', ro: ['shippaihaseikounomoto', 'sippaihaseikounomoto'] }, { ja: '継続は力なり', ro: ['keizokuhachikaranari'] },
-                { ja: '明日は明日の風が吹く', ro: ['ashitahaashitanokazegafuku', 'asitahaasitanokazegafuku'] }, { ja: 'ちりも積もれば山となる', ro: ['chirimotsumorebayamanatonaru', 'tirimotumorebayamanatonaru'] },
-                { ja: '終わりよければすべてよし', ro: ['owariyokerebasubeteyoshi'] }, { ja: '善は急げ', ro: ['zenhaisoge'] },
-                { ja: '郷に入っては郷に従え', ro: ['gouniittehagounishitagae'] }, { ja: '猿も木から落ちる', ro: ['sarumokikaraochiru'] },
-                { ja: '思い立ったが吉日', ro: ['omoitattagakichijitsu', 'omoitattagakitijitu'] }, { ja: '初心忘るべからず', ro: ['shoshinwasurubekarazu', 'syosinwasurubekarazu'] },
-                { ja: '能ある鷹は爪を隠す', ro: ['nouarutakahatsumewokakusu'] }, { ja: '七転び八起き', ro: ['nanakorobiyaoki'] },
+                { ja: '石の上にも三年', ro: ['ishinouenimosannen', 'isinouenimosannen'] }, { ja: '光陰矢の如し', ro: ['kouinyanogotoshi', 'kouinyanogotosi'] },
+                { ja: '失敗は成功のもと', ro: ['shippaihaseikounomoto', 'sippaihaseikounomoto'] }, { ja: '継続は力なり', ro: ['keizokuhachikaranari', 'keizokuhatikaranari'] },
+                { ja: '明日は明日の風が吹く', ro: ['ashitahaashitanokazegafuku', 'asitahaasitanokazegafuku'] }, { ja: 'ちりも積もれば山となる', ro: ['chirimotsumorebayamanatonaru', 'tirimotumorebayamanatonaru', 'chirimotumorebayamanatonaru'] },
+                { ja: '終わりよければすべてよし', ro: ['owariyokerebasubeteyoshi', 'owariyokerebasubeteyosi'] }, { ja: '善は急げ', ro: ['zenhaisoge'] },
+                { ja: '郷に入っては郷に従え', ro: ['gouniittehagounishitagae', 'gouniittehagounisitagae'] }, { ja: '猿も木から落ちる', ro: ['sarumokikaraochiru', 'sarumokikaraotiru'] },
+                { ja: '思い立ったが吉日', ro: ['omoitattagakichijitsu', 'omoitattagakitijitu', 'omoitattagakichizitsu', 'omoitattagakitizitu'] }, { ja: '初心忘るべからず', ro: ['shoshinwasurubekarazu', 'syosinwasurubekarazu', 'sosinwasurubekarazu'] },
+                { ja: '能ある鷹は爪を隠す', ro: ['nouarutakahatsumewokakusu', 'nouarutakahatumewokakusu'] }, { ja: '七転び八起き', ro: ['nanakorobiyaoki'] },
                 { ja: '笑う門には福来る', ro: ['waraukadonihafukukitaru'] }
             ],
             god: [
-                { ja: '事実は小説よりも奇なり。', ro: ['jijitsuhashousetsuyorimokinari.'] }, { ja: '天は人の上に人を造らず、人の下に人を造らず。', ro: ['tenhahitonouenihitowotsukurazu,hitonoshitanihitowotsukurazu.'] },
-                { ja: '青は藍より出でて藍より青し。', ro: ['aohaaiyoriideteaiyoriaoshi.'] }, { ja: '国破れて山河あり、城春にして草木深し。', ro: ['kuniyaburetesangaari,shiroharunishitesoumokufukashi.'] },
-                { ja: '吾輩は猫である。名前はまだ無い。', ro: ['wagahaihanekodearu.namaehamadanai.'] }, { ja: '祇園精舎の鐘の声、諸行無常の響きあり。', ro: ['gionshoujanokanenokoe,shogyoumujyounohibikiari.'] },
-                { ja: '李下に冠を正さず、瓜田に履を納れず。', ro: ['rikanikanmuriwotadasazu,kadenikutsuwoirezu.'] }, { ja: '少年よ大志を抱け。', ro: ['shounenyotaishiwoidake.', 'syounenyotaisiwoidake.'] },
-                { ja: '地球は青かった。', ro: ['chikyuuhaookatta.'] }, { ja: '隣の客はよく柿食う客だ。', ro: ['tonarinokyakuhayokukakikuukyakuda.'] },
+                { ja: '事実は小説よりも奇なり。', ro: ['jijitsuhashousetsuyorimokinari.', 'zizituha...', 'jijituhasyousetuyorimokinari.'] }, { ja: '天は人の上に人を造らず、人の下に人を造らず。', ro: ['tenhahitonouenihitowotsukurazu,hitonoshitanihitowotsukurazu.', 'tenhahitonouenihitowotukurazu,hitonoshitanihitowotukurazu.'] },
+                { ja: '青は藍より出でて藍より青し。', ro: ['aohaaiyoriideteaiyoriaoshi.', 'aohaaiyoriideteaiyoriaosi.'] }, { ja: '国破れて山河あり、城春にして草木深し。', ro: ['kuniyaburetesangaari,shiroharunishitesoumokufukashi.', 'kuniyaburetesangaari,siroharunishitesoumokufukasi.'] },
+                { ja: '吾輩は猫である。名前はまだ無い。', ro: ['wagahaihanekodearu.namaehamadanai.'] }, { ja: '祇園精舎の鐘の声、諸行無常の響きあり。', ro: ['gionshoujanokanenokoe,shogyoumujyounohibikiari.', 'gionsyouzyanokanenokoe,syogyoumuzyounohibikiari.'] },
+                { ja: '李下に冠を正さず、瓜田に履を納れず。', ro: ['rikanikanmuriwotadasazu,kadenikutsuwoirezu.', 'rikanikanmuriwotadasazu,kadenikutuwoirezu.'] }, { ja: '少年よ大志を抱け。', ro: ['shounenyotaishiwoidake.', 'syounenyotaisiwoidake.', 'sounenyotaisiwoidake.'] },
+                { ja: '地球は青かった。', ro: ['chikyuuhaookatta.', 'tikyuuhaookatta.'] }, { ja: '隣の客はよく柿食う客だ。', ro: ['tonarinokyakuhayokukakikuukyakuda.'] },
                 { ja: '生麦生米生卵。', ro: ['namamuginamagomenamatamago.'] }, { ja: '人の振り見て我が振り直せ。', ro: ['hitonofurimitewagafurinaose.'] },
-                { ja: '人間万事塞翁が馬。', ro: ['ningenbanjisaiougauma.'] }, { ja: 'ペンは剣よりも強し。', ro: ['penhakenyorimotsuyoshi.'] },
-                { ja: '百聞は一見に如かず。', ro: ['hyakubunhaikkennishikazu.'] }
+                { ja: '人間万事塞翁が馬。', ro: ['ningenbanjisaiougauma.', 'ningenbanzisaiougauma.'] }, { ja: 'ペンは剣よりも強し。', ro: ['penhakenyorimotsuyoshi.', 'penhakenyorimotuyosi.'] },
+                { ja: '百聞は一見に如かず。', ro: ['hyakubunhaikkennishikazu.', 'hyakubunhaikkennisikazu.'] }
             ],
             legend: [
                 { ja: 'この竹垣に竹立て掛けたのは竹立て掛けたかったから竹立て掛けた。', ro: ['konotakegakinitaketatekaketanohadaketatekaketakattakarataketatekaketa.'] },
                 { ja: '寿限無、寿限無、五劫の擦り切れ、海砂利水魚の、水行末。', ro: ['jugemu,jugemu,gokounosurikire,kaisarisuigyo,suigyoumatsu.'] },
                 { ja: '肩固かったから買った肩たたき機、高かった。', ro: ['katakatakattakarakattakatatatakiki,takakatta.'] },
-                { ja: '東京特許許可局長今日急遽休暇許可却下。', ro: ['toukyoutokkyokyokakyokuchoukyoukyuukyokyuukakyokakyakka.'] },
+                { ja: '東京特許許可局長今日急遽休暇許可却下。', ro: ['toukyoutokkyokyokakyokuchoukyoukyuukyokyuukakyokakyakka.', 'toukyoutokkyokyokakyokutyuukyoukyuukyokyuukakyokakyakka.'] },
                 { ja: '客観的で普遍的な思考は、主観的な感情を排除することから始まる。', ro: ['kyakkantekidefuhenntekinashikouhashukantekinakannjouwohaijosurukotokarahajimaru.'] },
                 { ja: '量子力学における重ね合わせの原理は、古典物理学の常識とは相容れない。', ro: ['ryoushirikigakuniokerukasaneawasenogenrihakotenbutsurigakunojousikitohaaiirenai.'] },
                 { ja: '複雑な社会経済状況下では、単一の解決策で問題が解消することは稀である。', ro: ['fukuzatsunashakaikeizaijoukyoukadehatannitsunokaiketsusakudemonndaikakaisyousurukotohamaredearu.'] },
